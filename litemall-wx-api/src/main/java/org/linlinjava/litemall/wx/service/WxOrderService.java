@@ -631,23 +631,23 @@ public class WxOrderService {
         }
 
         WxPayMwebOrderResult result = null;
-        try {
-            WxPayUnifiedOrderRequest orderRequest = new WxPayUnifiedOrderRequest();
-            orderRequest.setOutTradeNo(order.getOrderSn());
-            orderRequest.setTradeType("MWEB");
-            orderRequest.setBody("订单：" + order.getOrderSn());
-            // 元转成分
-            int fee = 0;
-            BigDecimal actualPrice = order.getActualPrice();
-            fee = actualPrice.multiply(new BigDecimal(100)).intValue();
-            orderRequest.setTotalFee(fee);
-            orderRequest.setSpbillCreateIp(IpUtil.getIpAddr(request));
-
-            result = wxPayService.createOrder(orderRequest);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+//        try {
+//            WxPayUnifiedOrderRequest orderRequest = new WxPayUnifiedOrderRequest();
+//            orderRequest.setOutTradeNo(order.getOrderSn());
+//            orderRequest.setTradeType("MWEB");
+//            orderRequest.setBody("订单：" + order.getOrderSn());
+//            // 元转成分
+//            int fee = 0;
+//            BigDecimal actualPrice = order.getActualPrice();
+//            fee = actualPrice.multiply(new BigDecimal(100)).intValue();
+//            orderRequest.setTotalFee(fee);
+//            orderRequest.setSpbillCreateIp(IpUtil.getIpAddr(request));
+//
+//            result = wxPayService.createOrder(orderRequest);
+//
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
 
         return ResponseUtil.ok(result);
     }
