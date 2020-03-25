@@ -608,6 +608,7 @@ public class WxOrderService {
      */
     @Transactional
     public Object h5pay(Integer userId, String body, HttpServletRequest request) {
+        System.out.println("进入h5pay");
         if (userId == null) {
             return ResponseUtil.unlogin();
         }
@@ -615,8 +616,15 @@ public class WxOrderService {
         if (orderId == null) {
             return ResponseUtil.badArgument();
         }
-
+        System.out.println("订单ID："+orderId);
         LitemallOrder order = orderService.findById(userId, orderId);
+        System.out.println("成功查询到订单！");
+        //设置付款成功
+        order.setOrderStatus(OrderUtil.STATUS_PAY);
+        System.out.println("设置为已付款");
+        if (orderService.updateWithOptimisticLocker(order) == 0) {
+            return WxPayNotifyResponse.fail("更新数据已失效");
+        }
         if (order == null) {
             return ResponseUtil.badArgumentValue();
         }
@@ -631,23 +639,23 @@ public class WxOrderService {
         }
 
         WxPayMwebOrderResult result = null;
-//        try {
-//            WxPayUnifiedOrderRequest orderRequest = new WxPayUnifiedOrderRequest();
-//            orderRequest.setOutTradeNo(order.getOrderSn());
-//            orderRequest.setTradeType("MWEB");
-//            orderRequest.setBody("订单：" + order.getOrderSn());
-//            // 元转成分
-//            int fee = 0;
-//            BigDecimal actualPrice = order.getActualPrice();
-//            fee = actualPrice.multiply(new BigDecimal(100)).intValue();
-//            orderRequest.setTotalFee(fee);
-//            orderRequest.setSpbillCreateIp(IpUtil.getIpAddr(request));
-//
-//            result = wxPayService.createOrder(orderRequest);
-//
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
+        try {
+            WxPayUnifiedOrderRequest orderRequest = new WxPayUnifiedOrderRequest();
+            orderRequest.setOutTradeNo(order.getOrderSn());
+            orderRequest.setTradeType("MWEB");
+            orderRequest.setBody("订单：" + order.getOrderSn());
+            // 元转成分
+            int fee = 0;
+            BigDecimal actualPrice = order.getActualPrice();
+            fee = actualPrice.multiply(new BigDecimal(100)).intValue();
+            orderRequest.setTotalFee(fee);
+            orderRequest.setSpbillCreateIp(IpUtil.getIpAddr(request));
+
+            result = wxPayService.createOrder(orderRequest);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         return ResponseUtil.ok(result);
     }

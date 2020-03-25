@@ -84,7 +84,7 @@ export default {
 
 i.success_icon {
   @extend .status_icon;
-  color: #06bf04;
+  color: #63B8FF;
 }
 
 i.fail_icon {

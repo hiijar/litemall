@@ -1,214 +1,148 @@
 <template>
-  <div class="payment">
-    <div class="time_down payment_group">
-      请在
-      <span class="red">半小时内</span>
-      完成付款，否则系统自动取消订单
-    </div>
+  <div id="app">
+    <h3 class="index-title">模拟的密码为：111111</h3>
 
-    <van-cell-group class="payment_group">
-      <van-cell title="订单编号" :value="order.orderInfo.orderSn"/>
-      <van-cell title="实付金额">
-        <span class="red">{{order.orderInfo.actualPrice *100 | yuan}}</span>
-      </van-cell>
-    </van-cell-group>
+    <div class="submit-btn" @click="onShowPay">支付</div>
 
-    <div class="pay_way_group">
-      <div class="pay_way_title">选择支付方式</div>
-      <van-radio-group v-model="payWay">
-        <van-cell-group>
-          <van-cell>
-            <template slot="title">
-              <img src="../../../assets/images/ali_pay.png" alt="支付宝" width="82" height="29">
-            </template>
-            <van-radio name="ali"/>
-          </van-cell>
-          <van-cell>
-            <template slot="title">
-              <img src="../../../assets/images/wx_pay.png" alt="微信支付" width="113" height="23">
-            </template>            
-            <van-radio name="wx"/>
-          </van-cell>
-        </van-cell-group>
-      </van-radio-group>
-    </div>
-
-    <van-button class="pay_submit" @click="pay" type="primary" bottomAction>去支付</van-button>
+    <!--支付密码弹窗-->
+    <vpay
+      ref="pays"
+      v-model="show"
+      @close="close"
+      @forget="forget"
+      @input-end="inputEnd"
+    ></vpay>
   </div>
 </template>
 
 <script>
-import { Radio, RadioGroup, Dialog } from 'vant';
-import { orderDetail, orderPrepay, orderH5pay } from '@/api/api';
-import _ from 'lodash';
-import { getLocalStorage, setLocalStorage } from '@/utils/local-storage';
+  import { Radio, RadioGroup, Dialog } from 'vant';
+  import { orderDetail, orderPrepay, orderH5pay } from '@/api/api';
+  import _ from 'lodash';
+  import { getLocalStorage, setLocalStorage } from '@/utils/local-storage';
 
-export default {
-  name: 'payment',
+  export default {
+    name: 'App',
 
-  data() {
-    return {
-      payWay: 'wx',
-      order: {
-        orderInfo: {},
-        orderGoods: []
-      },
-      orderId: 0
-    };
-  },
-  created() {
-    if (_.has(this.$route.params, 'orderId')) {
-      this.orderId = this.$route.params.orderId;
-      this.getOrder(this.orderId);
-    }
-  },
-  methods: {
-    getOrder(orderId) {
-      orderDetail({orderId: orderId}).then(res => {
-        this.order = res.data.data;
-      });
+    data () {
+      return {
+        show: false,
+        order: {
+          orderInfo: {},
+          orderGoods: []
+        },
+        orderId: 0
+      }
     },
-    pay() {
-      
-      Dialog.alert({
-        message: '你选择了' + (this.payWay === 'wx' ? '微信支付' : '支付宝支付')
-      }).then(() => {
-        if (this.payWay === 'wx') {
-          let ua = navigator.userAgent.toLowerCase();
-          let isWeixin = ua.indexOf('micromessenger') != -1;
-          if (isWeixin) {
-            orderPrepay({ orderId: this.orderId })
-              .then(res => {
-                let data = res.data.data;
-                let prepay_data = JSON.stringify({
-                  appId: data.appId,
-                  timeStamp: data.timeStamp,
-                  nonceStr: data.nonceStr,
-                  package: data.packageValue,
-                  signType: 'MD5',
-                  paySign: data.paySign
-                });
-                setLocalStorage({ prepay_data: prepay_data });
+    created() {
+      if (_.has(this.$route.params, 'orderId')) {
+        this.orderId = this.$route.params.orderId;
+        this.getOrder(this.orderId);
+      }
+    },
 
-                if (typeof WeixinJSBridge == 'undefined') {
-                  if (document.addEventListener) {
-                    document.addEventListener(
-                      'WeixinJSBridgeReady',
-                      this.onBridgeReady,
-                      false
-                    );
-                  } else if (document.attachEvent) {
-                    document.attachEvent(
-                      'WeixinJSBridgeReady',
-                      this.onBridgeReady
-                    );
-                    document.attachEvent(
-                      'onWeixinJSBridgeReady',
-                      this.onBridgeReady
-                    );
-                  }
-                } else {
-                  this.onBridgeReady();
-                }
-              })
-              .catch(err => {
-                Dialog.alert({ message: err.data.errmsg });
-                that.$router.replace({
+    methods: {
+      getOrder(orderId) {
+        orderDetail({orderId: orderId}).then(res => {
+          this.order = res.data.data;
+        });
+      },
+
+      onShowPay () {
+        this.show = true;
+      },
+
+      // 密码输入完成回调
+      inputEnd (val) {
+        setTimeout(() => {
+
+          // 模拟支付成功的结果
+          if (val != null){
+            if (val == 111111) {
+              // 调用插件的$success方法告知插件支付成功
+              // 并且在then方法里面可以写支付成功的回调，例如可以跳转支付结果页面
+              this.$refs.pays.$success().then(res => {
+                console.log('支付成功');
+                //this.$router.push('/user')
+                orderH5pay({ orderId: this.orderId })
+                        .then(res => {
+                          let data = res.data.data;
+                          window.location.replace(
+                                  data.mwebUrl +
+                                  '&redirect_url=' +
+                                  encodeURIComponent(
+                                          window.location.origin +
+                                          '/#/?orderId=' +
+                                          this.orderId +
+                                          '&tip=yes'
+                                  )
+                          );
+                        }).catch();    //新加catch
+                this.$router.replace({
                   name: 'paymentStatus',
                   params: {
-                    status: 'failed'
+                    status: 'success'
                   }
                 });
-              });
-          } else {
-            orderH5pay({ orderId: this.orderId })
-              .then(res => {
-                let data = res.data.data;
-                window.location.replace(
-                  data.mwebUrl +
-                  '&redirect_url=' +
-                  encodeURIComponent(
-                    window.location.origin +
-                    '/#/?orderId=' +
-                    this.orderId +
-                    '&tip=yes'
-                  )
-                );
-              })
-              .catch(err => {
-                Dialog.alert({ message: err.data.errmsg });
-              });
+                // .catch(err => {
+                //     Dialog.alert({ message: err.data.errmsg });
+                //   })
+                //this.$router.replace({path:'/wx/order/payCheck',params:orderDetail({ orderId: orderId })})
+              }).catch()
+              console.log("orderID: "+this.orderId);
+              // 模拟支付失败的结果
+            } else {
+              this.$refs.pays.$fail();
+            }
           }
-        } else {
-          //todo : alipay
-        }
-      });
-    },
-    onBridgeReady() {
-      let that = this;
-      let data = getLocalStorage('prepay_data');
-      // eslint-disable-next-line no-undef
-      WeixinJSBridge.invoke(
-        'getBrandWCPayRequest',
-        JSON.parse(data.prepay_data),
-        function(res) {
-          if (res.err_msg == 'get_brand_wcpay_request:ok') {
-            that.$router.replace({
-              name: 'paymentStatus',
-              params: {
-                status: 'success'
-              }
-            });
-          } else if (res.err_msg == 'get_brand_wcpay_request:cancel') {
-            that.$router.replace({
-              name: 'paymentStatus',
-              params: {
-                status: 'cancel'
-              }
-            });
-          } else {
-            that.$router.replace({
-              name: 'paymentStatus',
-              params: {
-                status: 'failed'
-              }
-            });
-          }
-        }
-      );
-    }
-  },
 
-  components: {
-    [Radio.name]: Radio,
-    [RadioGroup.name]: RadioGroup,
-    [Dialog.name]: Dialog
+
+
+        }, 1000)
+      },
+
+      // 取消支付弹窗关闭的回调
+      close() {
+        console.log('关闭')
+      },
+
+      // 忘记密码跳转
+      forget () {
+        console.log('触发forge事件');
+      }
+    }
   }
-};
 </script>
 
-<style lang="scss" scoped>
-.payment_group {
-  margin-bottom: 10px;
-}
-
-.time_down {
-  background-color: #fffeec;
-  padding: 10px 15px;
-}
-
-.pay_submit {
-  position: fixed;
-  bottom: 0;
-  width: 100%;
-}
-
-.pay_way_group img {
-  vertical-align: middle;
-}
-
-.pay_way_title {
-  padding: 15px;
-  background-color: #fff;
-}
+<style>
+  * {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+    user-select: none;
+  }
+  body {
+    max-width: 750px;
+    margin: 0 auto;
+  }
+  #app {
+    min-height: 100vh;
+    background: #f1f1f1;
+  }
+  .index-title {
+    padding-top: 50px;
+    font-weight: normal;
+    text-align: center;
+  }
+  .submit-btn {
+    width: 50%;
+    height: 50px;
+    margin: 100px auto 0;
+    line-height: 50px;
+    text-align: center;
+    border-radius: 10px;
+    background: #63B8FF;
+    color: #fff;
+    cursor: pointer;
+  }
 </style>

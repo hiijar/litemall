@@ -7,9 +7,9 @@ export default [
     meta: {
       login: true
     },
-    components: { 
-      default: () => import('@/views/order/tabbar-cart'), 
-      tabbar: Tabbar 
+    components: {
+      default: () => import('@/views/order/tabbar-cart'),
+      tabbar: Tabbar
     }
   },
   {

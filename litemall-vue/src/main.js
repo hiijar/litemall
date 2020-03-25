@@ -9,6 +9,10 @@ import VueCountdown from '@chenfengyuan/vue-countdown';
 
 import filters from '@/filter';
 
+import vpay from 'vpay';
+
+Vue.use(vpay);
+
 Vue.component(VueCountdown.name, VueCountdown);
 Vue.use(filters);
 
