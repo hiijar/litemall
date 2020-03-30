@@ -1,6 +1,6 @@
 package org.linlinjava.litemall.db.service;
 
-import org.linlinjava.litemall.db.dao.StatMapper;
+import org.linlinjava.litemall.db.mapper.StatMapper;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;

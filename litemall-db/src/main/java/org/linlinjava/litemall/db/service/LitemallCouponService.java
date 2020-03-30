@@ -2,8 +2,8 @@ package org.linlinjava.litemall.db.service;
 
 import com.alibaba.druid.util.StringUtils;
 import com.github.pagehelper.PageHelper;
-import org.linlinjava.litemall.db.dao.LitemallCouponMapper;
-import org.linlinjava.litemall.db.dao.LitemallCouponUserMapper;
+import org.linlinjava.litemall.db.mapper.LitemallCouponMapper;
+import org.linlinjava.litemall.db.mapper.LitemallCouponUserMapper;
 import org.linlinjava.litemall.db.domain.*;
 import org.linlinjava.litemall.db.domain.LitemallCoupon.Column;
 import org.linlinjava.litemall.db.util.CouponConstant;

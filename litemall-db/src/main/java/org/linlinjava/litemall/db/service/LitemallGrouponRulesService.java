@@ -2,8 +2,8 @@ package org.linlinjava.litemall.db.service;
 
 import com.alibaba.druid.util.StringUtils;
 import com.github.pagehelper.PageHelper;
-import org.linlinjava.litemall.db.dao.LitemallGoodsMapper;
-import org.linlinjava.litemall.db.dao.LitemallGrouponRulesMapper;
+import org.linlinjava.litemall.db.mapper.LitemallGoodsMapper;
+import org.linlinjava.litemall.db.mapper.LitemallGrouponRulesMapper;
 import org.linlinjava.litemall.db.domain.LitemallGoods;
 import org.linlinjava.litemall.db.domain.LitemallGrouponRules;
 import org.linlinjava.litemall.db.domain.LitemallGrouponRulesExample;
@@ -12,10 +12,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Service
 public class LitemallGrouponRulesService {

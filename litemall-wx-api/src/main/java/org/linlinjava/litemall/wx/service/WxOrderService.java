@@ -412,7 +412,7 @@ public class WxOrderService {
 
         // 删除购物车里面的商品信息
         cartService.clearGoods(userId);
-
+// TODO: 2020/3/30 订单中扣减库存操作位置 
         // 商品货品数量减少
         for (LitemallCart checkGoods : checkedGoodsList) {
             Integer productId = checkGoods.getProductId();

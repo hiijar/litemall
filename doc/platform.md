@@ -59,7 +59,7 @@ mybatis数据库访问代码是指dao接口代码、dao数据库XML文件和doma
 1. 读取`mybatis-generator`文件夹下的`generatorConfig.xml`文件
 2. 根据`jdbcConnection`访问数据库
 3. 根据`table`, 自动生成三种代码:
-   * src文件夹`org.linlinjava.litemall.db.dao` 包内的Java代码
+   * src文件夹`org.linlinjava.litemall.db.mapper` 包内的Java代码
    * src文件夹`org.linlinjava.litemall.db.domain` 包内的Java代码
    * resources文件夹`org.linlinjava.litemall.db.domain.dao` 内的XML文件
 

@@ -1,7 +1,7 @@
 package org.linlinjava.litemall.db.service;
 
 import com.github.pagehelper.PageHelper;
-import org.linlinjava.litemall.db.dao.LitemallAdminMapper;
+import org.linlinjava.litemall.db.mapper.LitemallAdminMapper;
 import org.linlinjava.litemall.db.domain.LitemallAdmin;
 import org.linlinjava.litemall.db.domain.LitemallAdmin.Column;
 import org.linlinjava.litemall.db.domain.LitemallAdminExample;

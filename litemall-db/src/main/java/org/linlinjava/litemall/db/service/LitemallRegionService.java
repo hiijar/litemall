@@ -1,7 +1,7 @@
 package org.linlinjava.litemall.db.service;
 
 import com.github.pagehelper.PageHelper;
-import org.linlinjava.litemall.db.dao.LitemallRegionMapper;
+import org.linlinjava.litemall.db.mapper.LitemallRegionMapper;
 import org.linlinjava.litemall.db.domain.LitemallRegion;
 import org.linlinjava.litemall.db.domain.LitemallRegionExample;
 import org.springframework.stereotype.Service;

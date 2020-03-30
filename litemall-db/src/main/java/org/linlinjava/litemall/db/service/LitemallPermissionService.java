@@ -1,11 +1,8 @@
 package org.linlinjava.litemall.db.service;
 
-import org.linlinjava.litemall.db.dao.LitemallPermissionMapper;
-import org.linlinjava.litemall.db.dao.LitemallRoleMapper;
+import org.linlinjava.litemall.db.mapper.LitemallPermissionMapper;
 import org.linlinjava.litemall.db.domain.LitemallPermission;
 import org.linlinjava.litemall.db.domain.LitemallPermissionExample;
-import org.linlinjava.litemall.db.domain.LitemallRole;
-import org.linlinjava.litemall.db.domain.LitemallRoleExample;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;

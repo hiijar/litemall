@@ -1,7 +1,7 @@
 package org.linlinjava.litemall.db.service;
 
 import com.github.pagehelper.PageHelper;
-import org.linlinjava.litemall.db.dao.LitemallFeedbackMapper;
+import org.linlinjava.litemall.db.mapper.LitemallFeedbackMapper;
 import org.linlinjava.litemall.db.domain.LitemallFeedback;
 import org.linlinjava.litemall.db.domain.LitemallFeedbackExample;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,7 +1,7 @@
 package org.linlinjava.litemall.db.service;
 
 import com.github.pagehelper.PageHelper;
-import org.linlinjava.litemall.db.dao.LitemallBrandMapper;
+import org.linlinjava.litemall.db.mapper.LitemallBrandMapper;
 import org.linlinjava.litemall.db.domain.LitemallBrand;
 import org.linlinjava.litemall.db.domain.LitemallBrand.Column;
 import org.linlinjava.litemall.db.domain.LitemallBrandExample;

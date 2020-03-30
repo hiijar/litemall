@@ -52,8 +52,8 @@
         </javaTypeResolver>
 
         <javaModelGenerator targetPackage="org.linlinjava.litemall.db.domain" targetProject="src/main/java"/>
-        <sqlMapGenerator targetPackage="org.linlinjava.litemall.db.dao" targetProject="src/main/resources"/>
-        <javaClientGenerator type="XMLMAPPER" targetPackage="org.linlinjava.litemall.db.dao"
+        <sqlMapGenerator targetPackage="org.linlinjava.litemall.db.mapper" targetProject="src/main/resources"/>
+        <javaClientGenerator type="XMLMAPPER" targetPackage="org.linlinjava.litemall.db.mapper"
                              targetProject="src/main/java"/>
         <!--表名-->
         <table tableName="litemall_ad">

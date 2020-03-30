@@ -1,7 +1,7 @@
 package org.linlinjava.litemall.db.service;
 
 import com.github.pagehelper.PageHelper;
-import org.linlinjava.litemall.db.dao.LitemallCommentMapper;
+import org.linlinjava.litemall.db.mapper.LitemallCommentMapper;
 import org.linlinjava.litemall.db.domain.LitemallComment;
 import org.linlinjava.litemall.db.domain.LitemallCommentExample;
 import org.springframework.stereotype.Service;
