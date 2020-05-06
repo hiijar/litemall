@@ -65,7 +65,12 @@ public class WxOrderController {
      */
     @PostMapping("submit")
     public Object submit(@LoginUser Integer userId, @RequestBody String body) {
-        return wxOrderService.submit(userId, body);
+        long startTime, endTime;
+        startTime = System.currentTimeMillis();
+        Object tmp = wxOrderService.submit(userId, body);
+        endTime = System.currentTimeMillis();
+        System.out.println("总耗时为: " + (endTime - startTime) + "ms");
+        return tmp;
     }
 
     /**

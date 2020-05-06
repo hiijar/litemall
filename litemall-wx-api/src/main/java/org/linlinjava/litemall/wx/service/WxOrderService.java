@@ -252,6 +252,7 @@ public class WxOrderService {
         if (body == null) {
             return ResponseUtil.badArgument();
         }
+        startTime = System.currentTimeMillis();
         Integer cartId = JacksonUtil.parseInteger(body, "cartId");
         Integer addressId = JacksonUtil.parseInteger(body, "addressId");
         Integer couponId = JacksonUtil.parseInteger(body, "couponId");
@@ -259,8 +260,11 @@ public class WxOrderService {
         String message = JacksonUtil.parseString(body, "message");
         Integer grouponRulesId = JacksonUtil.parseInteger(body, "grouponRulesId");
         Integer grouponLinkId = JacksonUtil.parseInteger(body, "grouponLinkId");
-
+        endTime = System.currentTimeMillis();
+        System.out.println("Json解析耗时: " + (endTime -
+                startTime) + "ms");
         //如果是团购项目,验证活动是否有效
+        startTime = System.currentTimeMillis();
         if (grouponRulesId != null && grouponRulesId > 0) {
             LitemallGrouponRules rules = grouponRulesService.findById(grouponRulesId);
             //找不到记录
@@ -295,25 +299,32 @@ public class WxOrderService {
                 }
             }
         }
-
+        endTime = System.currentTimeMillis();
+        System.out.println("团购活动检验耗时: " +
+                (endTime - startTime) + "ms");
         if (cartId == null || addressId == null || couponId == null) {
             return ResponseUtil.badArgument();
         }
 
         // 收货地址
+        startTime = System.currentTimeMillis();
         LitemallAddress checkedAddress = addressService.query(userId, addressId);
         if (checkedAddress == null) {
             return ResponseUtil.badArgument();
         }
-
+        endTime = System.currentTimeMillis();
+        System.out.println("收货地址检验耗时: " +
+                (endTime - startTime) + "ms");
         // 团购优惠
+        startTime = System.currentTimeMillis();
         BigDecimal grouponPrice = new BigDecimal(0);
         LitemallGrouponRules grouponRules = grouponRulesService.findById(grouponRulesId);
         if (grouponRules != null) {
             grouponPrice = grouponRules.getDiscount();
         }
-
+        endTime = System.currentTimeMillis();
         // 货品价格
+        startTime = System.currentTimeMillis();
         List<LitemallCart> checkedGoodsList = null;
         if (cartId.equals(0)) {
             checkedGoodsList = cartService.queryByUidAndChecked(userId);
@@ -334,9 +345,12 @@ public class WxOrderService {
                 checkedGoodsPrice = checkedGoodsPrice.add(checkGoods.getPrice().multiply(new BigDecimal(checkGoods.getNumber())));
             }
         }
-
+        endTime = System.currentTimeMillis();
+        System.out.println("货品价格检验耗时: " +
+                (endTime - startTime) + "ms");
         // 获取可用的优惠券信息
         // 使用优惠券减免的金额
+        startTime = System.currentTimeMillis();
         BigDecimal couponPrice = new BigDecimal(0);
         // 如果couponId=0则没有优惠券，couponId=-1则不使用优惠券
         if (couponId != 0 && couponId != -1) {
@@ -347,7 +361,10 @@ public class WxOrderService {
             couponPrice = coupon.getDiscount();
         }
 
-
+        endTime = System.currentTimeMillis();
+        System.out.println("优惠券检验耗时: " + (endTime
+                - startTime) + "ms");
+        startTime = System.currentTimeMillis();
         // 根据订单商品总价计算运费，满足条件（例如88元）则免运费，否则需要支付运费（例如8元）；
         BigDecimal freightPrice = new BigDecimal(0);
         if (checkedGoodsPrice.compareTo(SystemConfig.getFreightLimit()) < 0) {
@@ -361,7 +378,10 @@ public class WxOrderService {
         BigDecimal orderTotalPrice = checkedGoodsPrice.add(freightPrice).subtract(couponPrice).max(new BigDecimal(0));
         // 最终支付费用
         BigDecimal actualPrice = orderTotalPrice.subtract(integralPrice);
-
+        endTime = System.currentTimeMillis();
+        System.out.println("总费⽤计算耗时: " + (endTime
+                - startTime) + "ms");
+        startTime = System.currentTimeMillis();
         Integer orderId = null;
         LitemallOrder order = null;
         // 订单
@@ -387,7 +407,10 @@ public class WxOrderService {
         } else {
             order.setGrouponPrice(new BigDecimal(0));    //  团购价格
         }
-
+        endTime = System.currentTimeMillis();
+        System.out.println("向数据库插⼊新订单耗时: " +
+                (endTime - startTime) + "ms");
+        startTime = System.currentTimeMillis();
         // 添加订单表项
         orderService.add(order);
         orderId = order.getId();
@@ -412,6 +435,10 @@ public class WxOrderService {
 
         // 删除购物车里面的商品信息
         cartService.clearGoods(userId);
+        endTime = System.currentTimeMillis();
+        System.out.println("向数据库插⼊订单商品耗时: "
+                + (endTime - startTime) + "ms");
+        startTime = System.currentTimeMillis();
 // TODO: 2020/3/30 订单中扣减库存操作位置 
         // 商品货品数量减少
         for (LitemallCart checkGoods : checkedGoodsList) {
@@ -422,9 +449,11 @@ public class WxOrderService {
             if (remainNumber < 0) {
                 throw new RuntimeException("下单的商品货品数量大于库存量");
             }
+
             if (productService.reduceStock(productId, checkGoods.getNumber()) == 0) {
                 throw new RuntimeException("商品货品库存减少失败");
             }
+
         }
 
         // 如果使用了优惠券，设置优惠券使用状态
@@ -460,7 +489,9 @@ public class WxOrderService {
                 grouponLinkId = groupon.getId();
             }
         }
-
+        endTime = System.currentTimeMillis();
+        System.out.println("级联数据库其他表单耗时: " +
+                (endTime - startTime) + "ms");
         // 订单支付超期任务
         taskService.addTask(new OrderUnpaidTask(orderId));
 

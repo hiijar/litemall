@@ -25,7 +25,6 @@ public class LitemallSystemConfigService {
         for (LitemallSystem item : systemList) {
             systemConfigs.put(item.getKeyName(), item.getKeyValue());
         }
-
         return systemConfigs;
     }
 

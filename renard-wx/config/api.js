@@ -25,8 +25,7 @@ module.exports = {
   BrandList: WxApiRoot + 'brand/list', //品牌列表
   BrandDetail: WxApiRoot + 'brand/detail', //品牌详情
 
-  CartList: WxApiRoot + 'cart/index', //获取购物车的数据
-  CartAdd: WxApiRoot + 'cart/add', // 添加商品到购物车
+  CartList: WxApiRoot + 'cart/index', //获取购物车的数据tAdd: WxApiRoot + 'cart/add', // 添加商品到购物车
   CartFastAdd: WxApiRoot + 'cart/fastadd', // 立即购买商品
   CartUpdate: WxApiRoot + 'cart/update', // 更新购物车的商品
   CartDelete: WxApiRoot + 'cart/delete', // 删除购物车的商品

@@ -27,7 +27,6 @@ public class LitemallGoodsProductDAO {
     @Autowired
     private RedisTemplate redisTemplate;
 
-
     public int reduceStock(Integer id,Short num){
         String key=id.toString();
         Integer Value=(Integer)redisTemplate.opsForValue().get(key);
@@ -68,6 +67,7 @@ public class LitemallGoodsProductDAO {
             return litemallGoodsProductMapper.selectByPrimaryKey(id);
         }
     }
+
     @Scheduled(cron = "0 0/1 * * * ?")//TODO：为了方便看到结果 现在定时一分钟写回一次数据库，同时清空redis
     public void timerToWriteSock(){
         System.out.println("now time:" + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date())+"检查redis是否有数据需要写回");
