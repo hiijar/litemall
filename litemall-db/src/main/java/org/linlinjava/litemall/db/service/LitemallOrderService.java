@@ -28,7 +28,7 @@ public class LitemallOrderService {
     public int add(LitemallOrder order) {
         order.setAddTime(LocalDateTime.now());
         order.setUpdateTime(LocalDateTime.now());
-        return litemallOrderMapper.insert(order);
+        return litemallOrderMapper.insertSelective(order);
     }
 
     public int count(Integer userId) {

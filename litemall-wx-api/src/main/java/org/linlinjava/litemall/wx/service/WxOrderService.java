@@ -246,12 +246,16 @@ public class WxOrderService {
      */
     @Transactional
     public Object submit(Integer userId, String body) {
+
+        long startTime, endTime;
+
         if (userId == null) {
             return ResponseUtil.unlogin();
         }
         if (body == null) {
             return ResponseUtil.badArgument();
         }
+
         startTime = System.currentTimeMillis();
         Integer cartId = JacksonUtil.parseInteger(body, "cartId");
         Integer addressId = JacksonUtil.parseInteger(body, "addressId");
@@ -261,8 +265,8 @@ public class WxOrderService {
         Integer grouponRulesId = JacksonUtil.parseInteger(body, "grouponRulesId");
         Integer grouponLinkId = JacksonUtil.parseInteger(body, "grouponLinkId");
         endTime = System.currentTimeMillis();
-        System.out.println("Json解析耗时: " + (endTime -
-                startTime) + "ms");
+        System.out.println("Json解析耗时: " + (endTime - startTime) + "ms");
+
         //如果是团购项目,验证活动是否有效
         startTime = System.currentTimeMillis();
         if (grouponRulesId != null && grouponRulesId > 0) {
@@ -300,8 +304,8 @@ public class WxOrderService {
             }
         }
         endTime = System.currentTimeMillis();
-        System.out.println("团购活动检验耗时: " +
-                (endTime - startTime) + "ms");
+        System.out.println("团购活动检验耗时: " + (endTime - startTime) + "ms");
+
         if (cartId == null || addressId == null || couponId == null) {
             return ResponseUtil.badArgument();
         }
@@ -313,8 +317,8 @@ public class WxOrderService {
             return ResponseUtil.badArgument();
         }
         endTime = System.currentTimeMillis();
-        System.out.println("收货地址检验耗时: " +
-                (endTime - startTime) + "ms");
+        System.out.println("收货地址检验耗时: " + (endTime - startTime) + "ms");
+
         // 团购优惠
         startTime = System.currentTimeMillis();
         BigDecimal grouponPrice = new BigDecimal(0);
@@ -323,6 +327,8 @@ public class WxOrderService {
             grouponPrice = grouponRules.getDiscount();
         }
         endTime = System.currentTimeMillis();
+        System.out.println("团购优惠检验耗时: " + (endTime - startTime) + "ms");
+
         // 货品价格
         startTime = System.currentTimeMillis();
         List<LitemallCart> checkedGoodsList = null;
@@ -346,8 +352,8 @@ public class WxOrderService {
             }
         }
         endTime = System.currentTimeMillis();
-        System.out.println("货品价格检验耗时: " +
-                (endTime - startTime) + "ms");
+        System.out.println("货品价格检验耗时: " + (endTime - startTime) + "ms");
+
         // 获取可用的优惠券信息
         // 使用优惠券减免的金额
         startTime = System.currentTimeMillis();
@@ -360,27 +366,24 @@ public class WxOrderService {
             }
             couponPrice = coupon.getDiscount();
         }
-
         endTime = System.currentTimeMillis();
-        System.out.println("优惠券检验耗时: " + (endTime
-                - startTime) + "ms");
-        startTime = System.currentTimeMillis();
+        System.out.println("优惠券检验耗时: " + (endTime - startTime) + "ms");
+
         // 根据订单商品总价计算运费，满足条件（例如88元）则免运费，否则需要支付运费（例如8元）；
+        startTime = System.currentTimeMillis();
         BigDecimal freightPrice = new BigDecimal(0);
         if (checkedGoodsPrice.compareTo(SystemConfig.getFreightLimit()) < 0) {
             freightPrice = SystemConfig.getFreight();
         }
-
         // 可以使用的其他钱，例如用户积分
         BigDecimal integralPrice = new BigDecimal(0);
-
         // 订单费用
         BigDecimal orderTotalPrice = checkedGoodsPrice.add(freightPrice).subtract(couponPrice).max(new BigDecimal(0));
         // 最终支付费用
         BigDecimal actualPrice = orderTotalPrice.subtract(integralPrice);
         endTime = System.currentTimeMillis();
-        System.out.println("总费⽤计算耗时: " + (endTime
-                - startTime) + "ms");
+        System.out.println("总费用计算耗时: " + (endTime - startTime) + "ms");
+
         startTime = System.currentTimeMillis();
         Integer orderId = null;
         LitemallOrder order = null;
@@ -407,13 +410,13 @@ public class WxOrderService {
         } else {
             order.setGrouponPrice(new BigDecimal(0));    //  团购价格
         }
-        endTime = System.currentTimeMillis();
-        System.out.println("向数据库插⼊新订单耗时: " +
-                (endTime - startTime) + "ms");
-        startTime = System.currentTimeMillis();
+
         // 添加订单表项
         orderService.add(order);
         orderId = order.getId();
+        endTime = System.currentTimeMillis();
+        System.out.println("向数据库插入新订单耗时: " + (endTime - startTime) + "ms");
+        startTime = System.currentTimeMillis();
 
         // 添加订单商品表项
         for (LitemallCart cartGoods : checkedGoodsList) {
@@ -435,11 +438,11 @@ public class WxOrderService {
 
         // 删除购物车里面的商品信息
         cartService.clearGoods(userId);
+
         endTime = System.currentTimeMillis();
-        System.out.println("向数据库插⼊订单商品耗时: "
-                + (endTime - startTime) + "ms");
+        System.out.println("向数据库插入订单商品耗时: " + (endTime - startTime) + "ms");
+
         startTime = System.currentTimeMillis();
-// TODO: 2020/3/30 订单中扣减库存操作位置 
         // 商品货品数量减少
         for (LitemallCart checkGoods : checkedGoodsList) {
             Integer productId = checkGoods.getProductId();
@@ -449,11 +452,9 @@ public class WxOrderService {
             if (remainNumber < 0) {
                 throw new RuntimeException("下单的商品货品数量大于库存量");
             }
-
             if (productService.reduceStock(productId, checkGoods.getNumber()) == 0) {
                 throw new RuntimeException("商品货品库存减少失败");
             }
-
         }
 
         // 如果使用了优惠券，设置优惠券使用状态
@@ -490,8 +491,8 @@ public class WxOrderService {
             }
         }
         endTime = System.currentTimeMillis();
-        System.out.println("级联数据库其他表单耗时: " +
-                (endTime - startTime) + "ms");
+        System.out.println("级联数据库其他表单耗时: " + (endTime - startTime) + "ms");
+
         // 订单支付超期任务
         taskService.addTask(new OrderUnpaidTask(orderId));
 
@@ -639,7 +640,6 @@ public class WxOrderService {
      */
     @Transactional
     public Object h5pay(Integer userId, String body, HttpServletRequest request) {
-        System.out.println("进入h5pay");
         if (userId == null) {
             return ResponseUtil.unlogin();
         }
@@ -647,15 +647,8 @@ public class WxOrderService {
         if (orderId == null) {
             return ResponseUtil.badArgument();
         }
-        System.out.println("订单ID："+orderId);
+
         LitemallOrder order = orderService.findById(userId, orderId);
-        System.out.println("成功查询到订单！");
-        //设置付款成功
-        order.setOrderStatus(OrderUtil.STATUS_PAY);
-        System.out.println("设置为已付款");
-        if (orderService.updateWithOptimisticLocker(order) == 0) {
-            return WxPayNotifyResponse.fail("更新数据已失效");
-        }
         if (order == null) {
             return ResponseUtil.badArgumentValue();
         }

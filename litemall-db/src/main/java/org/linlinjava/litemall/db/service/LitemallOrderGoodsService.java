@@ -17,7 +17,8 @@ public class LitemallOrderGoodsService {
     public int add(LitemallOrderGoods orderGoods) {
         orderGoods.setAddTime(LocalDateTime.now());
         orderGoods.setUpdateTime(LocalDateTime.now());
-        return orderGoodsMapper.insertSelective(orderGoods);
+//        return orderGoodsMapper.insertSelective(orderGoods);
+        return orderGoodsMapper.insert(orderGoods);
     }
 
     public List<LitemallOrderGoods> queryByOid(Integer orderId) {
